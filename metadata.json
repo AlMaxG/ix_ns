@@ -1,0 +1,6 @@
+{
+  "name": "iXBT News Feed",
+  "description": "Автономная новостная лента полных статей с ixbt.com/news в фирменной тёмной теме с поддержкой догрузки архивов по датам",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
