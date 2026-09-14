@@ -472,6 +472,44 @@
         text-decoration: underline;
       }
 
+      .load-more-wrap {
+        text-align: center;
+        padding: 24px 0 44px;
+        margin-top: 16px;
+        border-top: 1px solid #222538;
+      }
+
+      .load-more-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: #7991BC;
+        text-decoration: none;
+        cursor: pointer;
+        padding: 10px 32px;
+        border-radius: 8px;
+        background-color: transparent;
+        transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, text-shadow 0.2s ease;
+        user-select: none;
+      }
+
+      .load-more-link:hover {
+        color: #ffffff;
+        background-color: rgba(121, 145, 188, 0.16);
+        text-shadow: 0 0 12px rgba(121, 145, 188, 0.6);
+        box-shadow: 0 0 16px rgba(121, 145, 188, 0.2);
+        text-decoration: none;
+      }
+
+      .load-more-link:active {
+        background-color: rgba(121, 145, 188, 0.26);
+        transform: scale(0.97);
+      }
+
       .feed-meta {
         font-size: 12px;
         color: #7c889f;
@@ -909,6 +947,11 @@
 
       <!-- Articles Container -->
       <div id="articles-feed"></div>
+
+      <!-- Load More Link -->
+      <div id="load-more-container" class="load-more-wrap" style="display: none;">
+        <a href="#" id="btn-load-more" class="load-more-link" title="Догрузить ещё 5 новостей">[ + ]</a>
+      </div>
     </main>
 
     <!-- Pure Vanilla JavaScript (NO NPM, NO REACT, 100% BROWSER) -->
@@ -980,7 +1023,9 @@
           articlesFeed: document.getElementById('articles-feed'),
           feedMetaInfo: document.getElementById('feed-meta-info'),
           btnExpandAll: document.getElementById('btn-expand-all'),
-          btnCollapseAll: document.getElementById('btn-collapse-all')
+          btnCollapseAll: document.getElementById('btn-collapse-all'),
+          loadMoreContainer: document.getElementById('load-more-container'),
+          btnLoadMore: document.getElementById('btn-load-more')
         };
 
         // Apply width styling
@@ -1475,6 +1520,7 @@
 
           if (state.articles.length === 0) {
             elements.articlesFeed.innerHTML = '<div style="text-align: center; padding: 40px; color: #7c889f;">Список новостей пуст.</div>';
+            if (elements.loadMoreContainer) elements.loadMoreContainer.style.display = 'none';
             return;
           }
 
@@ -1537,6 +1583,7 @@
           });
 
           elements.articlesFeed.innerHTML = html;
+          if (elements.loadMoreContainer) elements.loadMoreContainer.style.display = 'block';
         }
 
         // Global helpers
@@ -1587,6 +1634,7 @@
             elements.skeletonFeed.style.display = 'block';
             elements.articlesFeed.innerHTML = '';
           }
+          if (elements.loadMoreContainer) elements.loadMoreContainer.style.display = 'none';
 
           updateProgress(0, state.articleCount, 'Подключение к ' + state.baseUrl + ' ...');
 
@@ -1645,6 +1693,10 @@
                 break;
               }
             }
+
+            state.rawPublications = rawList;
+            state.seenUrls = seenUrls;
+            state.currentArchiveDate = currentDate;
 
             const targetCount = Math.min(rawList.length, state.articleCount);
             const loadedArticles = [];
@@ -1706,6 +1758,153 @@
             elements.refreshText.textContent = 'Обновить';
             elements.progressContainer.style.display = 'none';
           }
+        }
+
+        // Load more news routine
+        async function loadMoreNews(count = 5) {
+          if (state.isLoading) return;
+          state.isLoading = true;
+
+          const btn = elements.btnLoadMore;
+          const originalText = btn ? btn.textContent : '[ + ]';
+          if (btn) {
+            btn.style.pointerEvents = 'none';
+            btn.textContent = '[ … ]';
+          }
+          elements.btnRefresh.disabled = true;
+
+          try {
+            const baseDir = state.baseUrl.endsWith('/') ? state.baseUrl : state.baseUrl + '/';
+
+            // Ensure we have the raw publication list
+            if (!state.rawPublications || state.rawPublications.length === 0) {
+              const mainHtml = await fetchHtmlWithFallback(state.baseUrl);
+              state.rawPublications = extractPublicationList(mainHtml) || [];
+              state.seenUrls = new Set(state.rawPublications.map(item => item.url));
+              state.currentArchiveDate = getEarliestDate(state.rawPublications);
+            }
+
+            if (!state.seenUrls) {
+              state.seenUrls = new Set(state.rawPublications.map(item => item.url));
+            }
+            if (!state.currentArchiveDate) {
+              state.currentArchiveDate = getEarliestDate(state.rawPublications);
+            }
+
+            const startIndex = state.articles.length;
+            const targetCount = startIndex + count;
+
+            let dayAttempts = 0;
+            const maxDaysBack = 10;
+
+            while (state.rawPublications.length < targetCount && dayAttempts < maxDaysBack) {
+              dayAttempts++;
+              state.currentArchiveDate.setDate(state.currentArchiveDate.getDate() - 1);
+              const dateStr = formatDatePath(state.currentArchiveDate);
+              const dateArchiveUrl = baseDir + dateStr;
+
+              updateProgress(0, count, `Догрузка списка за ${dateStr}...`);
+
+              try {
+                const archiveHtml = await fetchHtmlWithFallback(dateArchiveUrl);
+                const archiveList = extractPublicationList(archiveHtml) || [];
+                if (archiveList.length === 0) break;
+
+                let addedNewCount = 0;
+                for (const it of archiveList) {
+                  if (!state.seenUrls.has(it.url)) {
+                    state.seenUrls.add(it.url);
+                    state.rawPublications.push(it);
+                    addedNewCount++;
+                    if (state.rawPublications.length >= targetCount) break;
+                  }
+                }
+                if (addedNewCount === 0) break;
+              } catch (dateErr) {
+                console.warn(`Не удалось загрузить новости за дату ${dateArchiveUrl}:`, dateErr);
+                break;
+              }
+            }
+
+            const finalTarget = Math.min(state.rawPublications.length, targetCount);
+
+            if (startIndex >= finalTarget) {
+              if (btn) btn.textContent = 'Больше новостей нет';
+              setTimeout(() => {
+                if (btn) {
+                  btn.textContent = originalText;
+                  btn.style.pointerEvents = '';
+                }
+              }, 2500);
+              return;
+            }
+
+            const needToLoad = finalTarget - startIndex;
+
+            for (let i = startIndex; i < finalTarget; i++) {
+              const item = state.rawPublications[i];
+              updateProgress(i - startIndex + 1, needToLoad, item.title);
+
+              try {
+                const articleHtml = await fetchHtmlWithFallback(item.url);
+                const parsed = parseArticleContent(articleHtml, item);
+                state.articles.push({
+                  id: item.id,
+                  rank: i + 1,
+                  url: item.url,
+                  title: parsed.title,
+                  subtitle: parsed.subtitle,
+                  timeStr: parsed.timeStr,
+                  commentsCount: parsed.commentsCount,
+                  sourceName: parsed.sourceName,
+                  sourceUrl: parsed.sourceUrl,
+                  category: parsed.category,
+                  blocks: parsed.blocks
+                });
+                state.expanded[item.id] = true;
+              } catch (artErr) {
+                console.warn('Ошибка загрузки статьи ' + item.url, artErr);
+                state.articles.push({
+                  id: item.id,
+                  rank: i + 1,
+                  url: item.url,
+                  title: item.title,
+                  subtitle: item.subtitle,
+                  timeStr: item.timeStr,
+                  commentsCount: item.commentsCount,
+                  sourceName: 'iXBT',
+                  sourceUrl: item.url,
+                  category: item.category,
+                  blocks: [{ type: 'paragraph', text: 'Полный текст статьи доступен по клику на заголовок.' }]
+                });
+                state.expanded[item.id] = true;
+              }
+
+              renderArticles();
+            }
+
+            state.lastUpdated = new Date();
+            elements.feedMetaInfo.textContent = state.articles.length + ' ' + (state.articles.length === 1 ? 'статья' : (state.articles.length < 5 ? 'статьи' : 'статей')) + ' · Обновлено в ' + state.lastUpdated.toLocaleTimeString('ru-RU');
+          } catch (err) {
+            console.error('Ошибка догрузки новостей:', err);
+            alert('Не удалось догрузить новости: ' + (err.message || 'Ошибка соединения.'));
+          } finally {
+            state.isLoading = false;
+            elements.btnRefresh.disabled = false;
+            elements.progressContainer.style.display = 'none';
+            if (btn) {
+              btn.textContent = originalText;
+              btn.style.pointerEvents = '';
+            }
+          }
+        }
+
+        window.loadMoreNews = loadMoreNews;
+        if (elements.btnLoadMore) {
+          elements.btnLoadMore.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadMoreNews(5);
+          });
         }
 
         // Start loading immediately upon page load!
