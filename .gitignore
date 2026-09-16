@@ -1,8 +1,0 @@
-# Ignore everything by default (all files and directories)
-*
-
-# Whitelist Git rules file so restrictions persist
-!.gitignore
-
-# Whitelist STRICTLY and ONLY index.html
-!index.html
