@@ -800,6 +800,61 @@
         border-top: 1px solid #23273e;
       }
 
+      .article-video-wrapper {
+        margin: 16px 0;
+        background-color: #161826;
+        border: 1px solid #23273e;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .article-video-wrapper .video-title {
+        padding: 8px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #e8e6e3;
+        background-color: #1a1d2e;
+        border-bottom: 1px solid #23273e;
+      }
+
+      .article-video-wrapper .video-embed-box {
+        position: relative;
+        width: 100%;
+        background-color: #000;
+      }
+
+      .article-video-wrapper .video-embed-box iframe,
+      .article-video-wrapper .video-embed-box video {
+        display: block;
+        width: 100%;
+        border: 0;
+      }
+
+      .article-video-wrapper .video-caption {
+        padding: 6px 12px;
+        font-size: 12px;
+        color: #8894a8;
+        background-color: #181a28;
+        border-top: 1px solid #23273e;
+      }
+
+      .article-video-wrapper .video-source-link {
+        padding: 6px 12px 8px;
+        font-size: 11px;
+        color: #7c889f;
+        background-color: #181a28;
+      }
+
+      .article-video-wrapper .video-source-link a {
+        color: #7991BC;
+        text-decoration: none;
+      }
+
+      .article-video-wrapper .video-source-link a:hover {
+        color: #9cb1d6;
+        text-decoration: underline;
+      }
+
       .article-footer {
         display: flex;
         justify-content: space-between;
@@ -1687,6 +1742,30 @@
                     }
                   } else if (b.type === 'lead' && b.text) {
                     blocks.push({ type: 'paragraph', text: b.text.trim() });
+                  } else if ((b.type === 'embed' || b.type === 'video') && (b.html || b.embedUrl || b.player || b.canonical)) {
+                    let embedHtml = b.html || '';
+                    let embedUrl = b.player?.youtube_embed_url || b.player?.vk_embed_url || b.player?.rutube_embed_url || b.player?.video_url || b.embedUrl || b.canonical || '';
+                    if (!embedHtml && embedUrl) {
+                      let iframeSrc = embedUrl;
+                      const ytMatch = embedUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                      if (ytMatch) {
+                        iframeSrc = 'https://www.youtube.com/embed/' + ytMatch[1] + '?rel=0&hl=ru-RU';
+                      } else if (embedUrl.includes('rutube.ru')) {
+                        const rtMatch = embedUrl.match(/rutube\.ru\/(?:video|play\/embed)\/([a-zA-Z0-9]+)/);
+                        if (rtMatch) {
+                          iframeSrc = 'https://rutube.ru/play/embed/' + rtMatch[1];
+                        }
+                      }
+                      embedHtml = '<div style="left: 0; width: 100%; height: 0; position: relative; padding-bottom: 56.25%;"><iframe src="' + iframeSrc + '" style="border: 0; top: 0; left: 0; width: 100%; height: 100%; position: absolute;" allowfullscreen scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe></div>';
+                    }
+                    blocks.push({
+                      type: 'video',
+                      html: embedHtml,
+                      url: b.canonical || b.embedUrl || b.player?.youtube_link || embedUrl,
+                      title: b.title || b.caption || '',
+                      caption: (b.caption && b.caption !== b.title ? b.caption : ''),
+                      provider: b.provider || b.service || 'YouTube'
+                    });
                   }
                 });
               }
@@ -1722,7 +1801,7 @@
           const contentDiv = doc.querySelector('.b-article__content, .news-content, article, .content');
           const blocks = [];
           if (contentDiv) {
-            contentDiv.querySelectorAll('p, blockquote, figure, img').forEach(node => {
+            contentDiv.querySelectorAll('p, blockquote, figure, img, iframe, video').forEach(node => {
               if (node.tagName === 'P') {
                 const txt = (node.textContent || '').trim();
                 if (txt && !txt.includes('Теги:') && !txt.includes('ixbt.com')) {
@@ -1737,6 +1816,32 @@
                   const baseOrigin = getBaseOrigin(state.baseUrl);
                   const fullSrc = src.startsWith('http') ? src : baseOrigin + (src.startsWith('/') ? '' : '/') + src;
                   blocks.push({ type: 'media', images: [{ url: fullSrc, caption: node.getAttribute('alt') || '' }] });
+                }
+              } else if (node.tagName === 'IFRAME') {
+                const src = node.getAttribute('src');
+                if (src && !src.includes('banner') && !src.includes('ad')) {
+                  const fullSrc = src.startsWith('//') ? 'https:' + src : src;
+                  const embedHtml = '<div style="left: 0; width: 100%; height: 0; position: relative; padding-bottom: 56.25%;"><iframe src="' + fullSrc + '" style="border: 0; top: 0; left: 0; width: 100%; height: 100%; position: absolute;" allowfullscreen scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe></div>';
+                  blocks.push({
+                    type: 'video',
+                    html: embedHtml,
+                    url: fullSrc,
+                    title: node.getAttribute('title') || 'Видео',
+                    provider: 'Видео'
+                  });
+                }
+              } else if (node.tagName === 'VIDEO') {
+                const src = node.getAttribute('src') || node.querySelector('source')?.getAttribute('src');
+                if (src) {
+                  const baseOrigin = getBaseOrigin(state.baseUrl);
+                  const fullSrc = src.startsWith('http') ? src : baseOrigin + (src.startsWith('/') ? '' : '/') + src;
+                  blocks.push({
+                    type: 'video',
+                    html: '<video controls style="width: 100%; max-height: 500px; display: block;" src="' + fullSrc + '"></video>',
+                    url: fullSrc,
+                    title: 'Видео',
+                    provider: 'Видео'
+                  });
                 }
               }
             });
@@ -1804,6 +1909,21 @@
                             ${img.caption ? `<figcaption>${img.caption}</figcaption>` : ''}
                           </figure>
                         `).join('');
+                      }
+                      if (b.type === 'video' && (b.html || b.url)) {
+                        const titleText = b.title ? `<div class="video-title">${b.title}</div>` : '';
+                        const captionText = b.caption ? `<div class="video-caption">${b.caption}</div>` : '';
+                        const directLink = b.url ? `<div class="video-source-link"><a href="${b.url}" target="_blank" rel="noopener noreferrer">Смотреть в источнике (${b.provider || 'Видео'}) ↗</a></div>` : '';
+                        return `
+                          <div class="article-video-wrapper">
+                            ${titleText}
+                            <div class="video-embed-box">
+                              ${b.html}
+                            </div>
+                            ${captionText}
+                            ${directLink}
+                          </div>
+                        `;
                       }
                       return '';
                     }).join('')}
