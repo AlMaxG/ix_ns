@@ -855,6 +855,211 @@
         text-decoration: underline;
       }
 
+      /* Article Comments Drawer */
+      .comments-drawer {
+        margin-top: 10px;
+        background-color: #141624;
+        border: 1px solid #23273e;
+        border-radius: 4px;
+        padding: 12px 14px;
+      }
+
+      .comments-loading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: #8894a8;
+        padding: 8px 2px;
+      }
+
+      .comments-spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid #2a3150;
+        border-top-color: #7991BC;
+        border-radius: 50%;
+        animation: spin-comment 0.8s linear infinite;
+        display: inline-block;
+      }
+
+      @keyframes spin-comment {
+        to { transform: rotate(360deg); }
+      }
+
+      .comments-error {
+        font-size: 12px;
+        color: #f87171;
+        padding: 6px 0;
+      }
+
+      .btn-retry-comments {
+        background-color: #21263d;
+        border: 1px solid #32395a;
+        color: #c4d0e5;
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .btn-retry-comments:hover {
+        background-color: #2a3150;
+        color: #ffffff;
+      }
+
+      .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .comment-item {
+        position: relative;
+      }
+
+      .comment-card {
+        background-color: #181b2c;
+        border: 1px solid #252a42;
+        border-radius: 4px;
+        padding: 9px 12px;
+      }
+
+      .comment-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        gap: 8px;
+      }
+
+      .comment-author-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .comment-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        object-fit: cover;
+        background-color: #23273e;
+        flex-shrink: 0;
+      }
+
+      .comment-avatar-placeholder {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background-color: #222741;
+        border: 1px solid #2d3557;
+        color: #919FD3;
+        font-size: 10px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .comment-author-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: #919FD3;
+        text-decoration: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .comment-author-name:hover {
+        text-decoration: underline;
+      }
+
+      .comment-date {
+        font-size: 11px;
+        color: #68758e;
+        white-space: nowrap;
+      }
+
+      .comment-rating {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 1px 6px;
+        border-radius: 3px;
+        white-space: nowrap;
+      }
+
+      .comment-rating.positive {
+        color: #4ade80;
+        background-color: rgba(74, 222, 128, 0.1);
+      }
+
+      .comment-rating.negative {
+        color: #f87171;
+        background-color: rgba(248, 113, 113, 0.1);
+      }
+
+      .comment-rating.neutral {
+        color: #68758e;
+        background-color: rgba(104, 117, 142, 0.1);
+      }
+
+      .comment-body {
+        font-size: 13px;
+        line-height: 1.5;
+        color: #cfd6e4;
+        word-break: break-word;
+      }
+
+      .comment-body blockquote {
+        margin: 6px 0;
+        padding: 6px 10px;
+        background-color: #121421;
+        border-left: 3px solid #343d60;
+        border-radius: 2px;
+        font-size: 12px;
+        color: #9bb0d3;
+        font-style: italic;
+      }
+
+      .comment-deleted {
+        font-style: italic;
+        color: #68758e;
+      }
+
+      .comment-replies-tree {
+        margin-top: 8px;
+        padding-left: 12px;
+        border-left: 2px solid #23273e;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .comments-footer-box {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid #23273e;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        color: #7c889f;
+      }
+
+      .comments-footer-box a {
+        color: #7991BC;
+        text-decoration: none;
+      }
+
+      .comments-footer-box a:hover {
+        color: #9cb1d6;
+        text-decoration: underline;
+      }
+
       .article-footer {
         display: flex;
         justify-content: space-between;
@@ -862,6 +1067,50 @@
         font-size: 12px;
         color: #7c889f;
         padding-top: 8px;
+        flex-wrap: wrap;
+        gap: 8px 16px;
+      }
+
+      .article-footer-right {
+        display: inline-flex;
+        align-items: center;
+        gap: 16px;
+        margin-left: auto;
+      }
+
+      .article-footer-right a,
+      .article-footer-right .toggle-link {
+        font-size: 12px;
+        font-weight: 500;
+        color: #7991BC;
+        text-decoration: none;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      .article-footer-right a:hover,
+      .article-footer-right .toggle-link:hover {
+        color: #9cb1d6;
+        text-decoration: underline;
+      }
+
+      .comments-link-icon {
+        color: #919FD3;
+        display: inline-block;
+        vertical-align: -2px;
+        margin-right: 4px;
+        transition: color 0.15s ease;
+      }
+
+      .comments-link-icon .comments-bubble-dot {
+        fill: #181A1B;
+      }
+
+      .article-footer-right .toggle-link:hover .comments-link-icon {
+        color: #9cb1d6;
       }
 
       /* Alert Box */
@@ -1211,6 +1460,7 @@
 
         // App State (persisted in localStorage)
         const savedFeedWidth = localStorage.getItem('ixbt_feed_width');
+        const COMMENT_ICON_SVG = '<svg class="comments-link-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/><circle cx="8" cy="10" r="1.4" class="comments-bubble-dot" fill="#181A1B"/><circle cx="12" cy="10" r="1.4" class="comments-bubble-dot" fill="#181A1B"/><circle cx="16" cy="10" r="1.4" class="comments-bubble-dot" fill="#181A1B"/></svg>';
         const state = {
           baseUrl: sanitizeBaseUrl(localStorage.getItem('ixbt_base_url') || DEFAULT_BASE_URL),
           articleCount: parseInt(localStorage.getItem('ixbt_article_count'), 10) || 10,
@@ -1220,6 +1470,8 @@
           isLoading: false,
           articles: [],
           expanded: {},
+          commentsExpanded: {},
+          commentsCache: {},
           lastUpdated: null
         };
 
@@ -1883,7 +2135,7 @@
 
                 <div class="article-meta-row">
                   <span class="meta-time">${art.timeStr || '15:57'}</span>
-                  <span class="meta-comments">${art.commentsCount}</span>
+                  <span class="meta-comments" ${art.commentsCount > 0 ? `style="cursor: pointer;" title="Комментарии (${art.commentsCount}) — развернуть" onclick="window.openCommentsForArticle(${art.id}, ${art.commentsCount})"` : ''}>${art.commentsCount}</span>
                   <span class="meta-source">
                     Источник: <a href="${art.sourceUrl || art.url}" target="_blank" rel="noopener noreferrer">${art.sourceName || 'iXBT'}</a>
                   </span>
@@ -1930,8 +2182,23 @@
 
                     <div class="article-footer">
                       <button type="button" class="toggle-link" onclick="window.toggleArticle(${art.id})">▲ Свернуть текст</button>
-                      <a href="${art.url}" target="_blank" rel="noopener noreferrer">Открыть оригинал на ixbt.com ↗</a>
+                      <div class="article-footer-right">
+                        <a href="${art.url}" target="_blank" rel="noopener noreferrer">Открыть оригинал на ixbt.com ↗</a>
+                        ${(art.commentsCount && art.commentsCount > 0) ? `
+                          <button type="button" class="toggle-link" id="comments-toggle-btn-${art.id}" onclick="window.toggleComments(${art.id}, ${art.commentsCount})">
+                            ${state.commentsExpanded[art.id] ? '▲ Свернуть комментарии' : `${COMMENT_ICON_SVG}Комментарии`} (${art.commentsCount})
+                          </button>
+                        ` : ''}
+                      </div>
                     </div>
+
+                    ${(art.commentsCount && art.commentsCount > 0) ? `
+                      <div class="comments-drawer" id="comments-drawer-${art.id}" style="${state.commentsExpanded[art.id] ? 'display: block;' : 'display: none;'}">
+                        ${state.commentsExpanded[art.id] && state.commentsCache[art.id]
+                          ? renderCommentsContent(state.commentsCache[art.id], art.id, art.commentsCount, art.url)
+                          : (state.commentsExpanded[art.id] ? `<div class="comments-loading"><span class="comments-spinner"></span> Загрузка комментариев (${art.commentsCount})...</div>` : '')}
+                      </div>
+                    ` : ''}
                   </div>
                 ` : `
                   <div>
@@ -1954,6 +2221,201 @@
         window.toggleArticle = function(id) {
           state.expanded[id] = !state.expanded[id];
           renderArticles();
+        };
+
+        function escapeHtml(str) {
+          if (!str) return '';
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+
+        function sanitizeCommentHtml(str) {
+          if (!str) return '';
+          return str
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+            .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+            .replace(/\son\w+="[^"]*"/gi, '')
+            .replace(/\son\w+='[^']*'/gi, '')
+            .replace(/javascript:/gi, '');
+        }
+
+        function renderCommentsContent(comments, artId, totalCount, articleUrl) {
+          if (!comments || comments.length === 0) {
+            return `
+              <div style="font-size: 13px; color: #7c889f; padding: 6px 0;">
+                Комментариев к этой статье пока нет.
+              </div>
+            `;
+          }
+
+          const topLevel = [];
+          const repliesMap = {};
+          comments.forEach(c => {
+            if (c.comment_pid && comments.some(p => p.comment_id === c.comment_pid)) {
+              if (!repliesMap[c.comment_pid]) repliesMap[c.comment_pid] = [];
+              repliesMap[c.comment_pid].push(c);
+            } else {
+              topLevel.push(c);
+            }
+          });
+
+          function renderCommentItem(c, depth = 0) {
+            const author = c.author || {};
+            const authorName = escapeHtml(author.name || 'Аноним');
+            const authorUrl = author.url || '';
+            const avatarUrl = author.avatar || '';
+            const dateStr = c.comment_date
+              ? new Date(c.comment_date).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+              : '';
+            const rating = typeof c.comment_rating === 'number' ? c.comment_rating : 0;
+            const ratingClass = rating > 0 ? 'positive' : (rating < 0 ? 'negative' : 'neutral');
+            const ratingStr = rating > 0 ? ('+' + rating) : String(rating);
+
+            let bodyHtml = '';
+            if (c.comment_delete) {
+              bodyHtml = '<div class="comment-deleted">Комментарий удалён</div>';
+            } else {
+              bodyHtml = sanitizeCommentHtml(c.comment_text || '');
+            }
+
+            const replies = repliesMap[c.comment_id] || [];
+
+            return `
+              <div class="comment-item" id="comment-${c.comment_id}">
+                <div class="comment-card">
+                  <div class="comment-header">
+                    <div class="comment-author-info">
+                      ${avatarUrl ? `
+                        <img src="${avatarUrl}" alt="${authorName}" class="comment-avatar" loading="lazy" onerror="this.outerHTML='<span class=\\'comment-avatar-placeholder\\'>${authorName.charAt(0).toUpperCase()}</span>'">
+                      ` : `
+                        <span class="comment-avatar-placeholder">${authorName.charAt(0).toUpperCase()}</span>
+                      `}
+                      ${authorUrl ? `
+                        <a href="${authorUrl}" target="_blank" rel="noopener noreferrer" class="comment-author-name">${authorName}</a>
+                      ` : `
+                        <span class="comment-author-name" style="color: #919FD3;">${authorName}</span>
+                      `}
+                      ${dateStr ? `<span class="comment-date">${dateStr}</span>` : ''}
+                    </div>
+                    <div class="comment-rating ${ratingClass}">${ratingStr}</div>
+                  </div>
+                  <div class="comment-body">${bodyHtml}</div>
+                </div>
+                ${replies.length > 0 ? `
+                  <div class="comment-replies-tree">
+                    ${replies.map(r => renderCommentItem(r, depth + 1)).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }
+
+          const itemsHtml = topLevel.map(c => renderCommentItem(c, 0)).join('');
+          const ixbtCommentsUrl = articleUrl ? (articleUrl + '#comments') : `https://www.ixbt.com/news/${artId}.html#comments`;
+
+          return `
+            <div class="comments-list">
+              ${itemsHtml}
+            </div>
+            <div class="comments-footer-box">
+              <span>Показано комментариев: ${comments.length}</span>
+              <a href="${ixbtCommentsUrl}" target="_blank" rel="noopener noreferrer">Обсудить на iXBT ↗</a>
+            </div>
+          `;
+        }
+
+        async function loadArticleComments(id, count) {
+          const art = state.articles.find(a => a.id === id);
+          const targetId = (art && art.id) || id;
+          const url = `https://www.ixbt.com/api/comments?target_id=${targetId}&target_type=universal_publication`;
+          try {
+            const raw = await fetchHtmlWithFallback(url);
+            const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            const comments = (data && (data.data?.comments || data.comments)) || [];
+            state.commentsCache[id] = comments;
+            const drawer = document.getElementById(`comments-drawer-${id}`);
+            if (drawer && state.commentsExpanded[id]) {
+              drawer.innerHTML = renderCommentsContent(comments, id, count, art ? art.url : '');
+            }
+          } catch (err) {
+            console.warn('Failed to load comments for article', id, err);
+            const drawer = document.getElementById(`comments-drawer-${id}`);
+            if (drawer && state.commentsExpanded[id]) {
+              const artUrl = art ? art.url : `https://www.ixbt.com/news/${id}.html`;
+              drawer.innerHTML = `
+                <div class="comments-error">
+                  <span>Не удалось загрузить комментарии: ${escapeHtml(err.message || 'ошибка сети')}</span>
+                  <div style="display: flex; gap: 10px; margin-top: 6px; align-items: center;">
+                    <button type="button" class="btn-retry-comments" onclick="window.retryComments(${id}, ${count})">Повторить попытку</button>
+                    <a href="${artUrl}#comments" target="_blank" rel="noopener noreferrer" style="color: #7991BC; font-size: 12px; text-decoration: underline;">Открыть на iXBT ↗</a>
+                  </div>
+                </div>
+              `;
+            }
+          }
+        }
+
+        window.toggleComments = function(id, count) {
+          const isNowExpanded = !state.commentsExpanded[id];
+          state.commentsExpanded[id] = isNowExpanded;
+
+          const drawer = document.getElementById(`comments-drawer-${id}`);
+          const toggleBtn = document.getElementById(`comments-toggle-btn-${id}`);
+
+          if (!drawer) return;
+
+          if (isNowExpanded) {
+            drawer.style.display = 'block';
+            if (toggleBtn) toggleBtn.innerHTML = `▲ Свернуть комментарии (${count})`;
+
+            if (state.commentsCache[id]) {
+              const art = state.articles.find(a => a.id === id);
+              drawer.innerHTML = renderCommentsContent(state.commentsCache[id], id, count, art ? art.url : '');
+            } else {
+              drawer.innerHTML = `
+                <div class="comments-loading">
+                  <span class="comments-spinner"></span> Загрузка комментариев (${count})...
+                </div>
+              `;
+              loadArticleComments(id, count);
+            }
+          } else {
+            drawer.style.display = 'none';
+            if (toggleBtn) toggleBtn.innerHTML = `${COMMENT_ICON_SVG}Комментарии (${count})`;
+          }
+        };
+
+        window.retryComments = function(id, count) {
+          delete state.commentsCache[id];
+          const drawer = document.getElementById(`comments-drawer-${id}`);
+          if (drawer) {
+            drawer.innerHTML = `
+              <div class="comments-loading">
+                <span class="comments-spinner"></span> Загрузка комментариев (${count})...
+              </div>
+            `;
+          }
+          loadArticleComments(id, count);
+        };
+
+        window.openCommentsForArticle = function(id, count) {
+          if (state.expanded[id] === false) {
+            state.expanded[id] = true;
+            renderArticles();
+          }
+          if (!state.commentsExpanded[id]) {
+            window.toggleComments(id, count);
+          }
+          const drawer = document.getElementById(`comments-drawer-${id}`);
+          if (drawer) {
+            setTimeout(() => {
+              drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+          }
         };
 
         // Helper to format date as YYYY/MM/DD
