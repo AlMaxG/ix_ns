@@ -2897,6 +2897,30 @@
               }
             }
           }, { passive: true });
+
+          // PageDown key trigger for load more (only after scroll indicator has appeared)
+          window.addEventListener('keydown', (e) => {
+            if (e.key === 'PageDown' || e.code === 'PageDown' || e.keyCode === 34) {
+              const target = e.target;
+              if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+                return;
+              }
+              if (!isWheelReady) {
+                return;
+              }
+              if (!isAtBottom() || state.isLoading || !state.articles || state.articles.length === 0) {
+                isWheelReady = false;
+                hideIndicator();
+                resetWheelHistory();
+                return;
+              }
+              e.preventDefault();
+              isWheelReady = false;
+              hideIndicator();
+              resetWheelHistory();
+              loadMoreNews(5);
+            }
+          });
         })();
 
         // Start loading immediately upon page load!
