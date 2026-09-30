@@ -649,6 +649,15 @@
         border-bottom: 1px solid #222538;
         padding-bottom: 32px;
         margin-bottom: 32px;
+        transition: filter 1s ease;
+      }
+
+      .article-item.is-old {
+        filter: grayscale(60%);
+      }
+
+      .article-item.is-old:hover {
+        filter: grayscale(0%);
       }
 
       .article-item:last-child {
@@ -676,14 +685,6 @@
       .article-title a:hover {
         color: #9cb1d6;
         text-decoration: underline;
-      }
-
-      .article-title.is-new a {
-        text-shadow: 0 0 7px rgba(145, 159, 211, 0.32), 0 0 14px rgba(145, 159, 211, 0.16);
-      }
-
-      .article-title.is-new a:hover {
-        text-shadow: 0 0 9px rgba(156, 177, 214, 0.45), 0 0 18px rgba(156, 177, 214, 0.22);
       }
 
       .article-subtitle {
@@ -2185,10 +2186,11 @@
           let html = '';
           state.articles.forEach(art => {
             const isExpanded = state.expanded[art.id] !== false;
+            const isOld = !art.isNew;
 
             html += `
-              <article class="article-item" id="article-${art.id}">
-                <h2 class="article-title ${art.isNew ? 'is-new' : ''}">
+              <article class="article-item ${isOld ? 'is-old' : 'is-fresh'}" id="article-${art.id}">
+                <h2 class="article-title">
                   <a href="${art.url}" target="_blank" rel="noopener noreferrer">${art.title}</a>
                 </h2>
 
@@ -2742,7 +2744,7 @@
               updateProgress(i - startIndex + 1, needToLoad, item.title);
 
               const normPath = getNormalizedArticlePath(item.url);
-              const isNew = normPath ? !seenPathsSet.has(normPath) : false;
+              const isNew = false;
               if (normPath) {
                 markArticlePathsAsSeen([normPath]);
               }
