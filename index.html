@@ -2744,7 +2744,7 @@
               updateProgress(i - startIndex + 1, needToLoad, item.title);
 
               const normPath = getNormalizedArticlePath(item.url);
-              const isNew = false;
+              const isNew = normPath ? !seenPathsSet.has(normPath) : false;
               if (normPath) {
                 markArticlePathsAsSeen([normPath]);
               }
