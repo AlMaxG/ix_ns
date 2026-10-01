@@ -1353,6 +1353,24 @@
           </div>
         </div>
 
+        <!-- Setting 6: Seen Articles History -->
+        <div class="settings-group" style="padding-top: 6px; border-top: 1px solid rgba(37,40,64,0.6);">
+          <div class="settings-label" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
+            <span>База прочитанного:</span>
+            <span class="badge-value" id="badge-seen-count" style="font-size: 11px; padding: 2px 6px;">0 статей</span>
+          </div>
+          <p style="font-size: 11px; color: #8c97ad; line-height: 1.35; margin: 4px 0 8px;">
+            Используется для обесцвечивания старых новостей. Очистка сбросит историю, и статьи снова станут свежими.
+          </p>
+          <button type="button" id="btn-clear-seen" class="chip-btn" style="width: 100%; justify-content: center; padding: 7px 10px; font-size: 12px; color: #e2e8f0; border-color: rgba(99, 102, 241, 0.4); background: rgba(99, 102, 241, 0.12); cursor: pointer;" title="Очистить список просмотренных статей">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span id="btn-clear-seen-text">Очистить базу прочитанных</span>
+          </button>
+        </div>
+
         <!-- Actions & Export -->
         <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: auto; border-top: 1px solid #282d3e;">
           <!-- Download HTML button -->
@@ -1513,6 +1531,9 @@
           badgeBaseUrl: document.getElementById('badge-base-url'),
           inputBaseUrl: document.getElementById('input-base-url'),
           btnResetBaseUrl: document.getElementById('btn-reset-base-url'),
+          badgeSeenCount: document.getElementById('badge-seen-count'),
+          btnClearSeen: document.getElementById('btn-clear-seen'),
+          btnClearSeenText: document.getElementById('btn-clear-seen-text'),
           btnApplySettings: document.getElementById('btn-apply-settings'),
           errorBox: document.getElementById('error-box'),
           errorMessage: document.getElementById('error-message'),
@@ -1612,9 +1633,11 @@
         applyCount(state.articleCount);
         applyWheelScrollLines(state.wheelScrollLines);
         applyBaseUrl(state.baseUrl);
+        updateSeenCountBadge();
 
         // Settings panel open/close helpers
         function openSettings() {
+          updateSeenCountBadge();
           elements.settingsPanel.classList.add('open');
           if (elements.settingsBackdrop) elements.settingsBackdrop.classList.add('open');
           elements.settingsPanel.setAttribute('aria-hidden', 'false');
@@ -1752,6 +1775,33 @@
           closeSettings();
           loadNews();
         });
+
+        if (elements.btnClearSeen) {
+          elements.btnClearSeen.addEventListener('click', () => {
+            clearSeenArticlePaths();
+
+            // Mark all articles in state as fresh
+            state.articles.forEach(art => {
+              art.isNew = true;
+            });
+
+            // Smoothly remove grayscale from currently displayed cards
+            document.querySelectorAll('.article-item.is-old').forEach(item => {
+              item.classList.remove('is-old');
+              item.classList.add('is-fresh');
+            });
+
+            if (elements.btnClearSeenText) {
+              const originalText = elements.btnClearSeenText.textContent;
+              elements.btnClearSeenText.textContent = 'База очищена ✓';
+              elements.btnClearSeen.style.pointerEvents = 'none';
+              setTimeout(() => {
+                if (elements.btnClearSeenText) elements.btnClearSeenText.textContent = originalText;
+                if (elements.btnClearSeen) elements.btnClearSeen.style.pointerEvents = '';
+              }, 2000);
+            }
+          });
+        }
 
         // Expand / Collapse all
         elements.btnExpandAll.addEventListener('click', () => {
@@ -1947,7 +1997,30 @@
             const arr = Array.from(seenSet);
             const trimmed = arr.length > 500 ? arr.slice(arr.length - 500) : arr;
             localStorage.setItem(SEEN_NEWS_STORAGE_KEY, JSON.stringify(trimmed));
+            updateSeenCountBadge();
           } catch (_) {}
+        }
+
+        function clearSeenArticlePaths() {
+          try {
+            localStorage.removeItem(SEEN_NEWS_STORAGE_KEY);
+            updateSeenCountBadge();
+          } catch (_) {}
+        }
+
+        function formatSeenCount(n) {
+          const mod10 = n % 10;
+          const mod100 = n % 100;
+          if (mod100 >= 11 && mod100 <= 19) return `${n} статей`;
+          if (mod10 === 1) return `${n} статья`;
+          if (mod10 >= 2 && mod10 <= 4) return `${n} статьи`;
+          return `${n} статей`;
+        }
+
+        function updateSeenCountBadge() {
+          if (!elements.badgeSeenCount) return;
+          const count = getSeenArticlePaths().size;
+          elements.badgeSeenCount.textContent = formatSeenCount(count);
         }
 
         // Extract list of news publications from main page
