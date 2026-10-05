@@ -1866,11 +1866,11 @@
         <div class="settings-group" style="padding-top: 6px; border-top: 1px solid rgba(37,40,64,0.6);">
           <div class="settings-label" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
             <span style="flex-shrink: 0; white-space: nowrap;">Базовый URL:</span>
-            <span class="badge-value" id="badge-base-url" style="flex: 1; min-width: 0; max-width: none; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; padding: 2px 6px;" title="https://www.ixbt.com/news/">https://www.ixbt.com/news/</span>
+            <span class="badge-value" id="badge-base-url" style="flex: 1; min-width: 0; max-width: none; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; padding: 2px 6px;" title="https://www.ixbt.com/news/tape">https://www.ixbt.com/news/tape</span>
           </div>
           <div style="display: flex; flex-direction: row; align-items: center; gap: 6px; width: 100%;">
-            <input type="url" id="input-base-url" value="https://www.ixbt.com/news/" placeholder="https://www.ixbt.com/news/" style="flex: 1; min-width: 0; width: 100%; padding: 6px 10px; font-size: 12px; box-sizing: border-box;">
-            <button type="button" id="btn-reset-base-url" class="chip-btn" style="flex-shrink: 0; white-space: nowrap; padding: 6px 8px; font-size: 11px;" title="Вернуть https://www.ixbt.com/news/">По умолчанию</button>
+            <input type="url" id="input-base-url" value="https://www.ixbt.com/news/tape" placeholder="https://www.ixbt.com/news/tape" style="flex: 1; min-width: 0; width: 100%; padding: 6px 10px; font-size: 12px; box-sizing: border-box;">
+            <button type="button" id="btn-reset-base-url" class="chip-btn" style="flex-shrink: 0; white-space: nowrap; padding: 6px 8px; font-size: 11px;" title="Вернуть https://www.ixbt.com/news/tape">По умолчанию</button>
           </div>
         </div>
 
@@ -1985,7 +1985,7 @@
     <!-- Pure Vanilla JavaScript (NO NPM, NO REACT, 100% BROWSER) -->
     <script>
       (function() {
-        const DEFAULT_BASE_URL = 'https://www.ixbt.com/news/';
+        const DEFAULT_BASE_URL = 'https://www.ixbt.com/news/tape';
 
         function sanitizeBaseUrl(url) {
           let u = (url || '').trim();
@@ -1994,6 +1994,16 @@
             u = 'https://' + u;
           }
           return u;
+        }
+
+        function getArchiveBaseDir(url) {
+          try {
+            let u = (url || '').trim();
+            u = u.replace(/\/tape\/?$/i, '');
+            return u.endsWith('/') ? u : u + '/';
+          } catch (_) {
+            return 'https://www.ixbt.com/news/';
+          }
         }
 
         function getBaseOrigin(url) {
@@ -2014,9 +2024,12 @@
 
         // App State (persisted in localStorage)
         const savedFeedWidth = localStorage.getItem('ixbt_feed_width');
+        const savedBaseUrl = localStorage.getItem('ixbt_base_url');
+        const isLegacyDefaultBaseUrl = !savedBaseUrl || savedBaseUrl === 'https://www.ixbt.com/news/' || savedBaseUrl === 'https://www.ixbt.com/news';
+        const initialBaseUrl = isLegacyDefaultBaseUrl ? DEFAULT_BASE_URL : sanitizeBaseUrl(savedBaseUrl);
         const COMMENT_ICON_SVG = '<svg class="comments-link-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/><circle cx="8" cy="10" r="1.4" class="comments-bubble-dot" fill="#181A1B"/><circle cx="12" cy="10" r="1.4" class="comments-bubble-dot" fill="#181A1B"/><circle cx="16" cy="10" r="1.4" class="comments-bubble-dot" fill="#181A1B"/></svg>';
         const state = {
-          baseUrl: sanitizeBaseUrl(localStorage.getItem('ixbt_base_url') || DEFAULT_BASE_URL),
+          baseUrl: initialBaseUrl,
           articleCount: parseInt(localStorage.getItem('ixbt_article_count'), 10) || 10,
           feedWidth: (!savedFeedWidth || savedFeedWidth === '896') ? '920' : savedFeedWidth,
           fetchMode: localStorage.getItem('ixbt_fetch_mode') || 'auto',
@@ -2709,10 +2722,22 @@
         function extractPublicationList(html) {
           const json = extractInertiaJson(html);
           const baseOrigin = getBaseOrigin(state.baseUrl);
-          const baseDir = state.baseUrl.endsWith('/') ? state.baseUrl : state.baseUrl + '/';
+          const baseDir = getArchiveBaseDir(state.baseUrl);
 
           if (json && json.props) {
-            const pubs = json.props.publications || json.props.news || json.props.items;
+            let pubs = json.props.publications || json.props.news || json.props.items || json.props.homePublications;
+            if (json.props.publication && Array.isArray(json.props.homePublications)) {
+              const pub = json.props.publication;
+              const exists = json.props.homePublications.some(p => p.id === pub.id || p.url === pub.url);
+              if (!exists) {
+                pubs = [pub, ...json.props.homePublications];
+              } else {
+                pubs = json.props.homePublications;
+              }
+            } else if (!pubs && json.props.publication) {
+              pubs = [json.props.publication];
+            }
+
             if (Array.isArray(pubs) && pubs.length > 0) {
               return pubs.map((p, idx) => {
                 const url = p.url || p.urls?.ru || (p.id ? baseDir + p.id + '.html' : '');
@@ -2750,7 +2775,7 @@
             if (items.length >= 60) return;
             const title = (a.textContent || '').trim();
             const href = a.getAttribute('href');
-            if (title.length > 15 && href && !href.includes('/comments/') && !href.endsWith('/news/')) {
+            if (title.length > 15 && href && !href.includes('/comments/') && !href.endsWith('/news/') && !href.includes('/news/tape')) {
               const fullUrl = href.startsWith('http') ? href : baseOrigin + (href.startsWith('/') ? '' : '/') + href;
               if (!items.some(x => x.url === fullUrl)) {
                 items.push({
@@ -3295,13 +3320,13 @@
             let currentDate = getEarliestDate(rawList);
             let dayAttempts = 0;
             const maxDaysBack = 10;
-            const baseDir = state.baseUrl.endsWith('/') ? state.baseUrl : state.baseUrl + '/';
+            const baseArchiveDir = getArchiveBaseDir(state.baseUrl);
 
             while (rawList.length < state.articleCount && dayAttempts < maxDaysBack) {
               dayAttempts++;
               currentDate.setDate(currentDate.getDate() - 1);
               const dateStr = formatDatePath(currentDate);
-              const dateArchiveUrl = baseDir + dateStr;
+              const dateArchiveUrl = baseArchiveDir + dateStr;
 
               updateProgress(
                 0,
@@ -3426,7 +3451,7 @@
           elements.btnRefresh.disabled = true;
 
           try {
-            const baseDir = state.baseUrl.endsWith('/') ? state.baseUrl : state.baseUrl + '/';
+            const baseArchiveDir = getArchiveBaseDir(state.baseUrl);
 
             // Ensure we have the raw publication list
             if (!state.rawPublications || state.rawPublications.length === 0) {
@@ -3453,7 +3478,7 @@
               dayAttempts++;
               state.currentArchiveDate.setDate(state.currentArchiveDate.getDate() - 1);
               const dateStr = formatDatePath(state.currentArchiveDate);
-              const dateArchiveUrl = baseDir + dateStr;
+              const dateArchiveUrl = baseArchiveDir + dateStr;
 
               updateProgress(0, count, `Догрузка списка за ${dateStr}...`);
 
