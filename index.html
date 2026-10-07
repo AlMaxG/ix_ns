@@ -1650,6 +1650,255 @@
       @keyframes spin {
         to { transform: rotate(360deg); }
       }
+
+      /* ==========================================
+         Web Speech API (TTS) Player Styles
+         ========================================== */
+      .btn-tts-listen {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(59, 130, 246, 0.1);
+        color: #93c5fd;
+        border: 1px solid rgba(59, 130, 246, 0.28);
+        font-size: 11px;
+        padding: 2px 7px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        line-height: 1.35;
+        font-family: inherit;
+        vertical-align: middle;
+      }
+      .btn-tts-listen:hover {
+        background: rgba(59, 130, 246, 0.22);
+        border-color: #60a5fa;
+        color: #ffffff;
+      }
+      .btn-tts-listen.is-playing {
+        background: rgba(16, 185, 129, 0.18);
+        border-color: #10b981;
+        color: #6ee7b7;
+      }
+
+      .article-item.is-speaking {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 1px #3b82f6, 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+        background: linear-gradient(180deg, rgba(37, 40, 64, 0.35) 0%, rgba(24, 26, 27, 0.98) 100%) !important;
+      }
+
+      .floating-tts-player {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 32px);
+        max-width: 860px;
+        background: rgba(18, 20, 28, 0.96);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid #2d3550;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 10px 16px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-sizing: border-box;
+        animation: slideUpTts 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes slideUpTts {
+        from { transform: translateX(-50%) translateY(30px); opacity: 0; }
+        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+      }
+
+      .tts-player-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .tts-player-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        flex: 1;
+      }
+
+      .tts-live-wave {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+      .tts-live-wave span {
+        display: block;
+        width: 3px;
+        height: 8px;
+        background-color: #60a5fa;
+        border-radius: 2px;
+        transition: height 0.2s ease;
+      }
+      .tts-live-wave.active span:nth-child(1) { animation: waveTts 0.8s infinite ease-in-out 0.1s; }
+      .tts-live-wave.active span:nth-child(2) { animation: waveTts 0.8s infinite ease-in-out 0.3s; }
+      .tts-live-wave.active span:nth-child(3) { animation: waveTts 0.8s infinite ease-in-out 0.5s; }
+      .tts-live-wave.active span:nth-child(4) { animation: waveTts 0.8s infinite ease-in-out 0.2s; }
+      @keyframes waveTts {
+        0%, 100% { height: 4px; }
+        50% { height: 16px; }
+      }
+
+      .tts-track-details {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        overflow: hidden;
+      }
+      .tts-queue-counter {
+        font-size: 11px;
+        font-weight: 600;
+        color: #93c5fd;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .tts-track-title {
+        font-size: 13px;
+        color: #e2e8f0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+      }
+
+      .tts-player-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        border-top: 1px solid rgba(45, 53, 80, 0.7);
+        padding-top: 8px;
+      }
+
+      .tts-playback-buttons {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .tts-btn-ctrl {
+        background: #1e2235;
+        border: 1px solid #2f3652;
+        color: #d1d5db;
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 30px;
+      }
+      .tts-btn-ctrl:hover {
+        background: #282e48;
+        border-color: #4b557b;
+        color: #ffffff;
+      }
+      .tts-btn-ctrl.tts-btn-primary {
+        background: #2563eb;
+        border-color: #3b82f6;
+        color: #ffffff;
+        font-weight: 700;
+      }
+      .tts-btn-ctrl.tts-btn-primary:hover {
+        background: #1d4ed8;
+      }
+
+      .tts-extra-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-left: auto;
+      }
+
+      .tts-speed-selector {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .tts-label-inline {
+        font-size: 11px;
+        color: #94a3b8;
+      }
+      .tts-speed-btn {
+        padding: 3px 6px !important;
+        font-size: 11px !important;
+      }
+
+      .tts-voice-select {
+        background: #1a1e30;
+        color: #cbd5e1;
+        border: 1px solid #333a54;
+        border-radius: 4px;
+        font-size: 11px;
+        padding: 3px 6px;
+        max-width: 140px;
+        outline: none;
+      }
+
+      .tts-badge-fresh {
+        font-size: 11px;
+        color: #10b981;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .tts-btn-icon {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: color 0.15s ease;
+      }
+      .tts-btn-icon:hover {
+        color: #f87171;
+        background: rgba(239, 68, 68, 0.1);
+      }
+
+      .tts-toast {
+        position: fixed;
+        bottom: 95px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1e293b;
+        color: #f8fafc;
+        border: 1px solid #475569;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+        pointer-events: none;
+        animation: fadeInTts 0.2s ease;
+      }
+      @keyframes fadeInTts {
+        from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+      }
     </style>
   </head>
   <body>
@@ -1678,6 +1927,15 @@
         </div>
 
         <div class="header-actions">
+          <!-- Listen fresh news button -->
+          <button id="btn-header-tts" class="btn btn-secondary" style="font-size: 13px; padding: 6px 11px; gap: 6px;" title="Озвучить свежие (непросмотренные) новости" onclick="window.startListeningFreshNews()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <span id="header-tts-btn-text">Слушать свежие</span>
+          </button>
+
           <!-- Refresh button -->
           <button id="btn-refresh" class="btn btn-primary">
             <span id="refresh-icon">
@@ -1934,6 +2192,7 @@
           <h1 class="feed-title">Лента новостей</h1>
           <button type="button" id="btn-expand-all" class="toggle-link">[ Развернуть все ]</button>
           <button type="button" id="btn-collapse-all" class="toggle-link">[ Свернуть все ]</button>
+          <button type="button" id="btn-listen-fresh" class="toggle-link" style="color: #60a5fa; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;" title="Озвучить свежие (непросмотренные) новости" onclick="window.startListeningFreshNews()">[ 🔊 Слушать свежие ]</button>
         </div>
         <div class="feed-meta" id="feed-meta-info">Загрузка...</div>
       </div>
@@ -1981,6 +2240,50 @@
         </div>
       </div>
     </div>
+
+    <!-- Floating TTS Audio Player -->
+    <div id="floating-tts-player" class="floating-tts-player" aria-label="Плеер озвучивания новостей" style="display: none;">
+      <div class="tts-player-top">
+        <div class="tts-player-info">
+          <span class="tts-live-wave" id="tts-live-wave">
+            <span></span><span></span><span></span><span></span>
+          </span>
+          <div class="tts-track-details">
+            <span class="tts-queue-counter" id="tts-queue-counter">Свежая новость 1 из 1</span>
+            <span class="tts-track-title" id="tts-track-title">Заголовок новости</span>
+          </div>
+        </div>
+        <button type="button" id="btn-tts-close" class="tts-btn-icon" title="Закрыть плеер и остановить чтение" onclick="window.ttsClosePlayer()">✕</button>
+      </div>
+
+      <div class="tts-player-controls">
+        <div class="tts-playback-buttons">
+          <button type="button" id="btn-tts-prev" class="tts-btn-ctrl" title="Предыдущая свежая новость" onclick="window.ttsPrev()">⏮</button>
+          <button type="button" id="btn-tts-playpause" class="tts-btn-ctrl tts-btn-primary" title="Пауза / Продолжить (Пробел)" onclick="window.ttsTogglePlayPause()">⏸</button>
+          <button type="button" id="btn-tts-next" class="tts-btn-ctrl" title="Следующая свежая новость" onclick="window.ttsNext()">⏭</button>
+          <button type="button" id="btn-tts-stop" class="tts-btn-ctrl" title="Остановить" onclick="window.ttsStop()">⏹</button>
+        </div>
+
+        <div class="tts-extra-controls">
+          <div class="tts-speed-selector" title="Скорость речи">
+            <span class="tts-label-inline">Скорость:</span>
+            <button type="button" class="chip-btn tts-speed-btn" data-speed="1.0" onclick="window.ttsSetSpeed(1.0)">1.0x</button>
+            <button type="button" class="chip-btn tts-speed-btn active" data-speed="1.25" onclick="window.ttsSetSpeed(1.25)">1.25x</button>
+            <button type="button" class="chip-btn tts-speed-btn" data-speed="1.5" onclick="window.ttsSetSpeed(1.5)">1.5x</button>
+            <button type="button" class="chip-btn tts-speed-btn" data-speed="2.0" onclick="window.ttsSetSpeed(2.0)">2.0x</button>
+          </div>
+
+          <div class="tts-voice-box" id="tts-voice-box" style="display: none;">
+            <select id="tts-voice-select" class="tts-voice-select" title="Выбор голоса" onchange="window.ttsSetVoice(this.value)"></select>
+          </div>
+
+          <span class="tts-badge-fresh" title="Озвучиваются только свежие, непросмотренные публикации">★ Только свежие</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast for TTS -->
+    <div id="tts-toast" class="tts-toast" style="display: none;"></div>
 
     <!-- Pure Vanilla JavaScript (NO NPM, NO REACT, 100% BROWSER) -->
     <script>
@@ -2093,7 +2396,18 @@
           btnLoadMore: document.getElementById('btn-load-more'),
           scrollLoadIndicator: document.getElementById('scroll-load-indicator'),
           scrollLoadText: document.getElementById('scroll-load-text'),
-          scrollTooltipThreshold: document.getElementById('scroll-tooltip-threshold')
+          scrollTooltipThreshold: document.getElementById('scroll-tooltip-threshold'),
+          floatingTtsPlayer: document.getElementById('floating-tts-player'),
+          ttsQueueCounter: document.getElementById('tts-queue-counter'),
+          ttsTrackTitle: document.getElementById('tts-track-title'),
+          ttsLiveWave: document.getElementById('tts-live-wave'),
+          btnTtsPlayPause: document.getElementById('btn-tts-playpause'),
+          ttsVoiceBox: document.getElementById('tts-voice-box'),
+          ttsVoiceSelect: document.getElementById('tts-voice-select'),
+          ttsToast: document.getElementById('tts-toast'),
+          btnHeaderTts: document.getElementById('btn-header-tts'),
+          headerTtsBtnText: document.getElementById('header-tts-btn-text'),
+          btnListenFresh: document.getElementById('btn-listen-fresh')
         };
 
         // Range slider progress fill helper
@@ -2289,10 +2603,21 @@
           closeSettings();
         });
 
-        // Close on Escape key
+        // Close on Escape key or handle Space for TTS
         document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && elements.settingsPanel.classList.contains('open')) {
-            closeSettings();
+          if (e.key === 'Escape') {
+            if (elements.settingsPanel.classList.contains('open')) {
+              closeSettings();
+            } else if (tts.isPlaying || tts.isPaused) {
+              window.ttsClosePlayer();
+            }
+          }
+          if (e.code === 'Space' && (tts.isPlaying || tts.isPaused)) {
+            const tag = (document.activeElement && document.activeElement.tagName) || '';
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !document.activeElement.isContentEditable) {
+              e.preventDefault();
+              window.ttsTogglePlayPause();
+            }
           }
         });
 
@@ -2958,6 +3283,513 @@
           };
         }
 
+        // ==========================================
+        // Web Speech API (TTS) - Озвучивание новостей
+        // ==========================================
+        const tts = {
+          isSupported: ('speechSynthesis' in window) && ('SpeechSynthesisUtterance' in window),
+          queue: [], // Список статей для воспроизведения
+          queueIndex: 0,
+          currentArticle: null,
+          chunks: [],
+          chunkIndex: 0,
+          isPlaying: false,
+          isPaused: false,
+          speed: parseFloat(localStorage.getItem('ixbt_tts_speed') || '1.25') || 1.25,
+          selectedVoiceURI: localStorage.getItem('ixbt_tts_voice') || '',
+          voices: [],
+          watchdogInterval: null,
+          toastTimer: null
+        };
+
+        function showTtsToast(msg, duration = 3200) {
+          if (!elements.ttsToast) return;
+          if (tts.toastTimer) clearTimeout(tts.toastTimer);
+          elements.ttsToast.textContent = msg;
+          elements.ttsToast.style.display = 'block';
+          tts.toastTimer = setTimeout(() => {
+            if (elements.ttsToast) elements.ttsToast.style.display = 'none';
+          }, duration);
+        }
+
+        function updateTtsVoices() {
+          if (!tts.isSupported) return;
+          try {
+            const all = window.speechSynthesis.getVoices() || [];
+            tts.voices = all.filter(v => v.lang && (v.lang.toLowerCase().startsWith('ru') || v.lang.includes('RU')));
+            populateVoiceSelect();
+          } catch (e) {
+            console.warn('Ошибка получения голосов речи:', e);
+          }
+        }
+
+        function populateVoiceSelect() {
+          if (!elements.ttsVoiceSelect || !elements.ttsVoiceBox) return;
+          if (!tts.voices || tts.voices.length <= 1) {
+            elements.ttsVoiceBox.style.display = 'none';
+            return;
+          }
+          elements.ttsVoiceBox.style.display = 'inline-block';
+          let html = '<option value="">(Авто-голос)</option>';
+          tts.voices.forEach(v => {
+            const isSelected = v.voiceURI === tts.selectedVoiceURI ? 'selected' : '';
+            html += `<option value="${v.voiceURI}" ${isSelected}>${v.name}</option>`;
+          });
+          elements.ttsVoiceSelect.innerHTML = html;
+        }
+
+        if (tts.isSupported) {
+          updateTtsVoices();
+          if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = updateTtsVoices;
+          }
+        }
+
+        function normalizeForComparison(str) {
+          return (str || '').toLowerCase().replace(/[^a-zа-я0-9]/gi, '');
+        }
+
+        function extractSpeakableText(art) {
+          if (!art) return '';
+          const parts = [];
+          const seenNorm = new Set();
+
+          if (art.title) {
+            const norm = normalizeForComparison(art.title);
+            if (norm) seenNorm.add(norm);
+            let t = art.title.trim();
+            if (!/[.!?]$/.test(t)) t += '.';
+            parts.push(t);
+          }
+
+          if (art.subtitle) {
+            const norm = normalizeForComparison(art.subtitle);
+            if (norm && !seenNorm.has(norm)) {
+              seenNorm.add(norm);
+              let s = art.subtitle.trim();
+              if (!/[.!?]$/.test(s)) s += '.';
+              parts.push(s);
+            }
+          }
+
+          if (Array.isArray(art.blocks)) {
+            art.blocks.forEach(b => {
+              if (b.type === 'paragraph' && b.text) {
+                let cleaned = b.text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+                if (cleaned.length > 5 && !cleaned.startsWith('http') && !cleaned.toLowerCase().includes('ixbt.com')) {
+                  const norm = normalizeForComparison(cleaned);
+                  if (norm && !seenNorm.has(norm)) {
+                    seenNorm.add(norm);
+                    if (!/[.!?]$/.test(cleaned)) cleaned += '.';
+                    parts.push(cleaned);
+                  }
+                }
+              } else if (b.type === 'quote' && b.text) {
+                let cleaned = b.text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+                if (cleaned) {
+                  const norm = normalizeForComparison(cleaned);
+                  if (norm && !seenNorm.has(norm)) {
+                    seenNorm.add(norm);
+                    if (!/[.!?]$/.test(cleaned)) cleaned += '.';
+                    parts.push(cleaned);
+                  }
+                }
+              }
+            });
+          }
+
+          return parts.join(' ');
+        }
+
+        function splitIntoSpeechChunks(text) {
+          if (!text) return [];
+          const clean = text.trim();
+          if (!clean) return [];
+          // Split on sentence-ending punctuation followed by space or newline
+          const rawSentences = clean.split(/(?<=[.!?;\n])\s+/).filter(s => s && s.trim());
+          const chunks = [];
+          for (let s of rawSentences) {
+            s = s.trim();
+            if (!s) continue;
+            if (s.length > 180) {
+              const words = s.split(/\s+/);
+              let cur = '';
+              for (const w of words) {
+                if ((cur + ' ' + w).length > 150) {
+                  if (cur.trim()) chunks.push(cur.trim());
+                  cur = w;
+                } else {
+                  cur = cur ? cur + ' ' + w : w;
+                }
+              }
+              if (cur.trim()) chunks.push(cur.trim());
+            } else {
+              chunks.push(s);
+            }
+          }
+          return chunks.length > 0 ? chunks : [clean];
+        }
+
+        function cancelCurrentSpeech(callback) {
+          if (tts.chunkTimer) {
+            clearTimeout(tts.chunkTimer);
+            tts.chunkTimer = null;
+          }
+          window._activeTtsUtterance = null;
+
+          const isEngineBusy = window.speechSynthesis && (window.speechSynthesis.speaking || window.speechSynthesis.pending || window.speechSynthesis.paused);
+          if (isEngineBusy) {
+            try {
+              if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+              }
+              window.speechSynthesis.cancel();
+            } catch (_) {}
+            // Allow Chrome's audio queue ~200ms to finish flush so the next utterance is not cancelled
+            setTimeout(callback, 200);
+          } else {
+            setTimeout(callback, 40);
+          }
+        }
+
+        function updatePlayerUI() {
+          if (!elements.floatingTtsPlayer) return;
+          if (tts.isPlaying || tts.isPaused) {
+            elements.floatingTtsPlayer.style.display = 'flex';
+            if (elements.headerTtsBtnText) {
+              elements.headerTtsBtnText.textContent = tts.isPaused ? 'Продолжить' : 'Пауза (озвучка)';
+            }
+            if (elements.btnListenFresh) {
+              elements.btnListenFresh.innerHTML = `[ ${tts.isPaused ? '▶' : '⏸'} ${tts.isPaused ? 'Продолжить' : 'Пауза озвучки'} ]`;
+            }
+          } else {
+            elements.floatingTtsPlayer.style.display = 'none';
+            if (elements.headerTtsBtnText) {
+              elements.headerTtsBtnText.textContent = 'Слушать свежие';
+            }
+            if (elements.btnListenFresh) {
+              elements.btnListenFresh.innerHTML = '[ 🔊 Слушать свежие ]';
+            }
+          }
+
+          if (elements.ttsLiveWave) {
+            if (tts.isPlaying && !tts.isPaused) {
+              elements.ttsLiveWave.classList.add('active');
+            } else {
+              elements.ttsLiveWave.classList.remove('active');
+            }
+          }
+
+          if (elements.btnTtsPlayPause) {
+            elements.btnTtsPlayPause.textContent = (tts.isPlaying && !tts.isPaused) ? '⏸' : '▶';
+          }
+
+          if (tts.currentArticle) {
+            if (elements.ttsQueueCounter) {
+              const isBatch = tts.queue.length > 1;
+              elements.ttsQueueCounter.textContent = isBatch 
+                ? `Свежая новость ${tts.queueIndex + 1} из ${tts.queue.length}`
+                : `Озвучивание новости #${tts.currentArticle.rank || 1}`;
+            }
+            if (elements.ttsTrackTitle) {
+              elements.ttsTrackTitle.textContent = tts.currentArticle.title || 'Без названия';
+            }
+          }
+
+          updateSpeedButtons();
+        }
+
+        function updateSpeedButtons() {
+          const speedBtns = document.querySelectorAll('.tts-speed-btn');
+          speedBtns.forEach(b => {
+            const s = parseFloat(b.getAttribute('data-speed'));
+            if (Math.abs(s - tts.speed) < 0.05) {
+              b.classList.add('active');
+            } else {
+              b.classList.remove('active');
+            }
+          });
+        }
+
+        function updateArticlesHighlight() {
+          document.querySelectorAll('.article-item').forEach(card => {
+            card.classList.remove('is-speaking');
+          });
+          document.querySelectorAll('.btn-tts-listen').forEach(btn => {
+            btn.classList.remove('is-playing');
+            const id = btn.id.replace('btn-tts-', '');
+            const icon = document.getElementById('btn-tts-icon-' + id);
+            const label = document.getElementById('btn-tts-label-' + id);
+            if (icon) icon.textContent = '🔊';
+            if (label) label.textContent = 'Слушать';
+          });
+
+          if ((tts.isPlaying || tts.isPaused) && tts.currentArticle) {
+            const activeCard = document.getElementById('article-' + tts.currentArticle.id);
+            if (activeCard) {
+              activeCard.classList.add('is-speaking');
+            }
+            const activeBtn = document.getElementById('btn-tts-' + tts.currentArticle.id);
+            if (activeBtn) {
+              activeBtn.classList.add('is-playing');
+              const icon = document.getElementById('btn-tts-icon-' + tts.currentArticle.id);
+              const label = document.getElementById('btn-tts-label-' + tts.currentArticle.id);
+              if (icon) icon.textContent = tts.isPaused ? '▶' : '⏸';
+              if (label) label.textContent = tts.isPaused ? 'Продолжить' : 'Пауза';
+            }
+          }
+        }
+
+        function speakCurrentChunk() {
+          if (!tts.isSupported || !tts.isPlaying || tts.isPaused) return;
+
+          if (tts.chunkIndex >= tts.chunks.length) {
+            // Article finished! Advance to next in queue
+            tts.queueIndex++;
+            if (tts.queueIndex < tts.queue.length) {
+              playArticleAtQueueIndex(tts.queueIndex);
+            } else {
+              stopTts();
+              showTtsToast('Прослушивание свежих новостей завершено');
+            }
+            return;
+          }
+
+          const chunkText = tts.chunks[tts.chunkIndex];
+          if (!chunkText || !chunkText.trim()) {
+            tts.chunkIndex++;
+            setTimeout(speakCurrentChunk, 30);
+            return;
+          }
+
+          const utterance = new SpeechSynthesisUtterance(chunkText);
+          utterance.lang = 'ru-RU';
+          utterance.rate = tts.speed;
+
+          let voiceToUse = null;
+          if (tts.selectedVoiceURI && tts.voices.length > 0) {
+            voiceToUse = tts.voices.find(v => v.voiceURI === tts.selectedVoiceURI);
+          }
+          if (!voiceToUse && tts.voices.length > 0) {
+            voiceToUse = tts.voices.find(v => v.lang && (v.lang.toLowerCase().startsWith('ru') || v.lang.includes('RU'))) || tts.voices[0];
+          }
+          if (voiceToUse) {
+            utterance.voice = voiceToUse;
+          }
+
+          // Retain reference on window to prevent garbage collection in Chrome/Safari
+          window._activeTtsUtterance = utterance;
+
+          // Clear any previous chunk watchdog
+          if (tts.chunkTimer) {
+            clearTimeout(tts.chunkTimer);
+            tts.chunkTimer = null;
+          }
+
+          // Safety watchdog: in case onend never fires
+          const maxWaitMs = Math.max(7000, Math.round((chunkText.length * 250) / tts.speed));
+          tts.chunkTimer = setTimeout(() => {
+            if (tts.isPlaying && !tts.isPaused && window._activeTtsUtterance === utterance) {
+              window._activeTtsUtterance = null;
+              tts.chunkIndex++;
+              setTimeout(speakCurrentChunk, 50);
+            }
+          }, maxWaitMs);
+
+          utterance.onend = () => {
+            if (tts.chunkTimer) {
+              clearTimeout(tts.chunkTimer);
+              tts.chunkTimer = null;
+            }
+            window._activeTtsUtterance = null;
+            if (!tts.isPlaying || tts.isPaused) return;
+            tts.chunkIndex++;
+            setTimeout(speakCurrentChunk, 60);
+          };
+
+          utterance.onerror = (e) => {
+            if (tts.chunkTimer) {
+              clearTimeout(tts.chunkTimer);
+              tts.chunkTimer = null;
+            }
+            window._activeTtsUtterance = null;
+            if (e && (e.error === 'interrupted' || e.error === 'canceled')) {
+              return;
+            }
+            console.warn('Ошибка фразы TTS:', e);
+            if (!tts.isPlaying || tts.isPaused) return;
+            tts.chunkIndex++;
+            setTimeout(speakCurrentChunk, 60);
+          };
+
+          window.speechSynthesis.speak(utterance);
+        }
+
+        function playArticleAtQueueIndex(idx) {
+          if (!tts.isSupported) {
+            alert('Ваш браузер не поддерживает синтез речи (Web Speech API).');
+            return;
+          }
+          if (idx < 0 || idx >= tts.queue.length) {
+            stopTts();
+            return;
+          }
+
+          tts.isPlaying = true;
+
+          cancelCurrentSpeech(() => {
+            if (!tts.isPlaying) return;
+
+            tts.queueIndex = idx;
+            const art = tts.queue[idx];
+            tts.currentArticle = art;
+            tts.isPaused = false;
+
+            const rawText = extractSpeakableText(art);
+            tts.chunks = splitIntoSpeechChunks(rawText);
+            tts.chunkIndex = 0;
+
+            updatePlayerUI();
+            updateArticlesHighlight();
+
+            const elem = document.getElementById('article-' + art.id);
+            if (elem) {
+              elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            if (tts.chunks.length > 0) {
+              speakCurrentChunk();
+            } else {
+              // If no speakable text, move to next article
+              tts.queueIndex++;
+              if (tts.queueIndex < tts.queue.length) {
+                playArticleAtQueueIndex(tts.queueIndex);
+              } else {
+                stopTts();
+              }
+            }
+          });
+        }
+
+        function stopTts() {
+          tts.isPlaying = false;
+          tts.isPaused = false;
+          tts.currentArticle = null;
+          tts.chunks = [];
+          tts.chunkIndex = 0;
+
+          cancelCurrentSpeech(() => {
+            updatePlayerUI();
+            updateArticlesHighlight();
+          });
+        }
+
+        window.startListeningFreshNews = function() {
+          if (!tts.isSupported) {
+            alert('Ваш браузер не поддерживает синтез речи (Web Speech API).');
+            return;
+          }
+
+          if (tts.isPlaying) {
+            window.ttsTogglePlayPause();
+            return;
+          }
+
+          // STRICT FILTER: ONLY fresh / unread articles as requested
+          const fresh = (state.articles || []).filter(a => a.isNew);
+          if (fresh.length === 0) {
+            showTtsToast('Нет свежих непросмотренных новостей. Вы можете послушать любую статью по кнопке [ 🔊 ] или сбросить историю в настройках.');
+            return;
+          }
+
+          tts.queue = fresh;
+          tts.queueIndex = 0;
+          playArticleAtQueueIndex(0);
+        };
+
+        window.toggleSpeakArticle = function(articleId) {
+          if (!tts.isSupported) {
+            alert('Ваш браузер не поддерживает синтез речи (Web Speech API).');
+            return;
+          }
+
+          if (tts.isPlaying && tts.currentArticle && tts.currentArticle.id === articleId) {
+            window.ttsTogglePlayPause();
+            return;
+          }
+
+          const art = (state.articles || []).find(a => a.id === articleId);
+          if (!art) return;
+
+          tts.queue = [art];
+          tts.queueIndex = 0;
+          playArticleAtQueueIndex(0);
+        };
+
+        window.ttsTogglePlayPause = function() {
+          if (!tts.isPlaying) {
+            window.startListeningFreshNews();
+            return;
+          }
+
+          if (tts.isPaused) {
+            tts.isPaused = false;
+            window.speechSynthesis.resume();
+            updatePlayerUI();
+            updateArticlesHighlight();
+          } else {
+            tts.isPaused = true;
+            window.speechSynthesis.pause();
+            updatePlayerUI();
+            updateArticlesHighlight();
+          }
+        };
+
+        window.ttsStop = function() {
+          stopTts();
+        };
+
+        window.ttsClosePlayer = function() {
+          stopTts();
+        };
+
+        window.ttsNext = function() {
+          if (tts.queueIndex < tts.queue.length - 1) {
+            playArticleAtQueueIndex(tts.queueIndex + 1);
+          } else {
+            showTtsToast('Это последняя новость в текущей очереди');
+          }
+        };
+
+        window.ttsPrev = function() {
+          if (tts.queueIndex > 0) {
+            playArticleAtQueueIndex(tts.queueIndex - 1);
+          }
+        };
+
+        window.ttsSetSpeed = function(newSpeed) {
+          tts.speed = newSpeed;
+          localStorage.setItem('ixbt_tts_speed', String(newSpeed));
+          updateSpeedButtons();
+          if (tts.isPlaying && !tts.isPaused) {
+            try {
+              window.speechSynthesis.cancel();
+            } catch (_) {}
+            speakCurrentChunk();
+          }
+        };
+
+        window.ttsSetVoice = function(voiceURI) {
+          tts.selectedVoiceURI = voiceURI;
+          localStorage.setItem('ixbt_tts_voice', voiceURI);
+          if (tts.isPlaying && !tts.isPaused) {
+            try {
+              window.speechSynthesis.cancel();
+            } catch (_) {}
+            speakCurrentChunk();
+          }
+        };
+
         // Render articles list to DOM
         function renderArticles() {
           elements.skeletonFeed.style.display = 'none';
@@ -2972,9 +3804,11 @@
           state.articles.forEach(art => {
             const isExpanded = state.expanded[art.id] !== false;
             const isOld = !art.isNew;
+            const isSpeakingThis = tts.isPlaying && tts.currentArticle && tts.currentArticle.id === art.id;
+            const ttsBtnClass = isSpeakingThis ? 'btn-tts-listen is-playing' : 'btn-tts-listen';
 
             html += `
-              <article class="article-item ${isOld ? 'is-old' : 'is-fresh'}" id="article-${art.id}">
+              <article class="article-item ${isOld ? 'is-old' : 'is-fresh'} ${isSpeakingThis ? 'is-speaking' : ''}" id="article-${art.id}">
                 <h2 class="article-title">
                   <a href="${art.url}" target="_blank" rel="noopener noreferrer">${art.title}</a>
                 </h2>
@@ -2982,6 +3816,10 @@
                 ${art.subtitle ? `<h3 class="article-subtitle">${art.subtitle}</h3>` : ''}
 
                 <div class="article-meta-row">
+                  <button type="button" class="${ttsBtnClass}" id="btn-tts-${art.id}" onclick="window.toggleSpeakArticle(${art.id})" title="Озвучить эту публикацию">
+                    <span id="btn-tts-icon-${art.id}">${isSpeakingThis ? (tts.isPaused ? '▶' : '⏸') : '🔊'}</span>
+                    <span id="btn-tts-label-${art.id}">${isSpeakingThis ? (tts.isPaused ? 'Продолжить' : 'Пауза') : 'Слушать'}</span>
+                  </button>
                   <span class="meta-time">${art.timeStr || '15:57'}</span>
                   <span class="meta-comments" ${art.commentsCount > 0 ? `style="cursor: pointer;" title="Комментарии (${art.commentsCount}) — развернуть" onclick="window.openCommentsForArticle(${art.id}, ${art.commentsCount})"` : ''}>${art.commentsCount}</span>
                   <span class="meta-source">
@@ -3296,6 +4134,10 @@
         // Main loading routine
         async function loadNews() {
           if (state.isLoading) return;
+
+          if (tts.isPlaying) {
+            stopTts();
+          }
 
           state.isLoading = true;
           elements.errorBox.style.display = 'none';
