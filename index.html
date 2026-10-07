@@ -1215,6 +1215,20 @@
         color: #7c889f;
       }
 
+      .meta-main-badge {
+        background: rgba(195, 145, 65, 0.08);
+        color: #988056;
+        border: 1px solid rgba(195, 145, 65, 0.2);
+        font-size: 11px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        letter-spacing: 0.1px;
+      }
+
       .meta-rank {
         color: rgba(82, 135, 198, 0.7);
         font-family: monospace;
@@ -2725,21 +2739,59 @@
           const baseDir = getArchiveBaseDir(state.baseUrl);
 
           if (json && json.props) {
-            let pubs = json.props.publications || json.props.news || json.props.items || json.props.homePublications;
-            if (json.props.publication && Array.isArray(json.props.homePublications)) {
-              const pub = json.props.publication;
-              const exists = json.props.homePublications.some(p => p.id === pub.id || p.url === pub.url);
-              if (!exists) {
-                pubs = [pub, ...json.props.homePublications];
-              } else {
-                pubs = json.props.homePublications;
-              }
-            } else if (!pubs && json.props.publication) {
-              pubs = [json.props.publication];
+            let pubs = json.props.publications || json.props.news || json.props.items || json.props.homePublications || [];
+            if (!Array.isArray(pubs) && typeof pubs === 'object') {
+              pubs = Object.values(pubs);
             }
 
-            if (Array.isArray(pubs) && pubs.length > 0) {
-              const result = pubs.map((p, idx) => {
+            // Gather pinned / main news from Inertia props and publication flags
+            const rawPinned = [];
+            if (Array.isArray(json.props.pinned)) {
+              rawPinned.push(...json.props.pinned);
+            }
+            if (Array.isArray(json.props.mainNews)) {
+              rawPinned.push(...json.props.mainNews);
+            }
+            if (json.props.publication && Array.isArray(json.props.homePublications)) {
+              rawPinned.push(json.props.publication);
+            }
+
+            const pinnedFromPubs = [];
+            const regularPubs = [];
+            for (const p of pubs) {
+              if (p && (p.pinned || p.is_main || p.is_top || p.important || p.featured)) {
+                pinnedFromPubs.push(p);
+              } else if (p) {
+                regularPubs.push(p);
+              }
+            }
+
+            // Combine pinned articles ensuring uniqueness, marking _isMainNews
+            const seenPubKeys = new Set();
+            const prioritizedPinned = [];
+            for (const p of [...rawPinned, ...pinnedFromPubs]) {
+              if (!p) continue;
+              const key = String(p.id || p.url || p.urls?.ru || p.title);
+              if (!seenPubKeys.has(key)) {
+                seenPubKeys.add(key);
+                p._isMainNews = true;
+                prioritizedPinned.push(p);
+              }
+            }
+
+            // Combine prioritized pinned news first, followed by regular news
+            const orderedPubs = [...prioritizedPinned];
+            for (const p of regularPubs) {
+              if (!p) continue;
+              const key = String(p.id || p.url || p.urls?.ru || p.title);
+              if (!seenPubKeys.has(key)) {
+                seenPubKeys.add(key);
+                orderedPubs.push(p);
+              }
+            }
+
+            if (orderedPubs.length > 0) {
+              const result = orderedPubs.map((p, idx) => {
                 const url = p.url || p.urls?.ru || (p.id ? baseDir + p.id + '.html' : '');
                 const timeStr = p.formated_pubdatetime || p.formated_pubdatetime_full ||
                   (p.pubdatetime ? new Date(p.pubdatetime).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '15:57');
@@ -2752,6 +2804,7 @@
                   title: p.title || 'Без названия',
                   subtitle: p.subtitle || '',
                   url: url,
+                  isMain: Boolean(p._isMainNews || p.pinned || p.is_main || p.is_top),
                   pubdatetime: p.pubdatetime || p.published_at || '',
                   timeStr: timeStr,
                   commentsCount: Number(p.comments_count || 0),
@@ -2788,6 +2841,7 @@
                   title: title,
                   subtitle: '',
                   url: fullUrl,
+                  isMain: false,
                   timeStr: 'Недавно',
                   commentsCount: 0,
                   category: 'Новости',
@@ -2982,6 +3036,7 @@
                 ${art.subtitle ? `<h3 class="article-subtitle">${art.subtitle}</h3>` : ''}
 
                 <div class="article-meta-row">
+                  ${art.isMain ? `<span class="meta-main-badge">★ Главная</span>` : ''}
                   <span class="meta-time">${art.timeStr || '15:57'}</span>
                   <span class="meta-comments" ${art.commentsCount > 0 ? `style="cursor: pointer;" title="Комментарии (${art.commentsCount}) — развернуть" onclick="window.openCommentsForArticle(${art.id}, ${art.commentsCount})"` : ''}>${art.commentsCount}</span>
                   <span class="meta-source">
@@ -3396,6 +3451,7 @@
                   rank: i + 1,
                   url: item.url,
                   isNew: isNew,
+                  isMain: Boolean(item.isMain),
                   title: parsed.title,
                   subtitle: parsed.subtitle,
                   timeStr: parsed.timeStr,
@@ -3413,6 +3469,7 @@
                   rank: i + 1,
                   url: item.url,
                   isNew: isNew,
+                  isMain: Boolean(item.isMain),
                   title: item.title,
                   subtitle: item.subtitle,
                   timeStr: item.timeStr,
@@ -3548,6 +3605,7 @@
                   rank: i + 1,
                   url: item.url,
                   isNew: isNew,
+                  isMain: Boolean(item.isMain),
                   title: parsed.title,
                   subtitle: parsed.subtitle,
                   timeStr: parsed.timeStr,
@@ -3565,6 +3623,7 @@
                   rank: i + 1,
                   url: item.url,
                   isNew: isNew,
+                  isMain: Boolean(item.isMain),
                   title: item.title,
                   subtitle: item.subtitle,
                   timeStr: item.timeStr,
