@@ -2773,7 +2773,7 @@
 
         if (elements.btnClearSeen) {
           elements.btnClearSeen.addEventListener('click', () => {
-            clearSeenArticlePaths();
+            clearSeenArticleIds();
 
             // Mark all articles in state as fresh
             state.articles.forEach(art => {
@@ -2967,65 +2967,58 @@
           throw new Error('Не удалось получить доступ к ' + url + '. Разрешите CORS в браузере (например, расширением «Allow CORS») или откройте через локальный сервер.');
         }
 
-        // Normalized article pathname for unique identification (e.g. /news/2026/09/21/title.html)
-        function getNormalizedArticlePath(rawUrl) {
-          if (!rawUrl || typeof rawUrl !== 'string') return '';
-          let url = rawUrl.trim();
-          const proxyMatch = url.match(/[?&]url=([^&]+)/i);
-          if (proxyMatch) {
-            try {
-              url = decodeURIComponent(proxyMatch[1]);
-            } catch (_) {
-              url = proxyMatch[1];
-            }
-          }
-          try {
-            const parsed = new URL(url, 'https://www.ixbt.com');
-            let pathname = parsed.pathname;
-            if (!pathname.startsWith('/')) pathname = '/' + pathname;
-            pathname = pathname.replace(/\/+/g, '/');
-            return pathname.toLowerCase();
-          } catch (_) {
-            const m = url.match(/(\/news\/[^\s?#]+)/i);
-            if (m) {
-              return m[1].toLowerCase().replace(/\/+/g, '/');
-            }
-            return url.split('?')[0].split('#')[0].toLowerCase();
-          }
-        }
+        // --- SEEN ARTICLES PERSISTENCE & SNAPSHOT (БазаОсновная и БазаДо) ---
+        // PRIMARY STORAGE KEY: 'ixbt_seen_news_ids' (stores array of native article IDs)
+        const SEEN_NEWS_STORAGE_KEY = 'ixbt_seen_news_ids';
+        const LEGACY_SEEN_PATHS_KEY = 'ixbt_seen_news_paths';
 
-        const SEEN_NEWS_STORAGE_KEY = 'ixbt_seen_news_paths';
-
-        function getSeenArticlePaths() {
+        // БазаОсновная: get all seen IDs from localStorage
+        function getSeenArticleIds() {
           try {
             const raw = localStorage.getItem(SEEN_NEWS_STORAGE_KEY);
-            if (!raw) return new Set();
-            const arr = JSON.parse(raw);
-            return new Set(Array.isArray(arr) ? arr : []);
+            if (raw) {
+              const arr = JSON.parse(raw);
+              return new Set(Array.isArray(arr) ? arr.map(x => String(x)) : []);
+            }
+            return new Set();
           } catch (_) {
             return new Set();
           }
         }
 
-        function markArticlePathsAsSeen(paths) {
-          if (!paths || paths.length === 0) return;
+        // Add IDs to БазаОсновная (localStorage)
+        function markArticleIdsAsSeen(ids) {
+          if (!ids || ids.length === 0) return;
           try {
-            const seenSet = getSeenArticlePaths();
-            paths.forEach(p => {
-              if (p) seenSet.add(p);
+            const seenSet = getSeenArticleIds();
+            ids.forEach(id => {
+              if (id !== undefined && id !== null && id !== '') {
+                seenSet.add(String(id));
+              }
             });
             const arr = Array.from(seenSet);
-            const trimmed = arr.length > 500 ? arr.slice(arr.length - 500) : arr;
+            const trimmed = arr.length > 2000 ? arr.slice(arr.length - 2000) : arr;
             localStorage.setItem(SEEN_NEWS_STORAGE_KEY, JSON.stringify(trimmed));
             updateSeenCountBadge();
           } catch (_) {}
         }
 
-        function clearSeenArticlePaths() {
+        // Clear БазаОсновная and reset active session snapshot
+        function clearSeenArticleIds() {
           try {
             localStorage.removeItem(SEEN_NEWS_STORAGE_KEY);
+            localStorage.removeItem(LEGACY_SEEN_PATHS_KEY);
+            seenSnapshotBeforeLoad = new Set();
             updateSeenCountBadge();
           } catch (_) {}
+        }
+
+        // БазаДо (Снимок состояния на момент старта цикла обновления ленты)
+        let seenSnapshotBeforeLoad = new Set();
+
+        function createSeenSnapshot() {
+          seenSnapshotBeforeLoad = getSeenArticleIds();
+          return seenSnapshotBeforeLoad;
         }
 
         function formatSeenCount(n) {
@@ -3039,7 +3032,7 @@
 
         function updateSeenCountBadge() {
           if (!elements.badgeSeenCount) return;
-          const count = getSeenArticlePaths().size;
+          const count = getSeenArticleIds().size;
           elements.badgeSeenCount.textContent = formatSeenCount(count);
         }
 
@@ -4216,7 +4209,8 @@
             state.currentArchiveDate = currentDate;
             state.nextDateUrl = nextDateUrl;
 
-            const seenPathsSet = getSeenArticlePaths();
+            // Сценарий А (цикл обновления): создаем БазаДо (снимок БазыОсновной на момент старта)
+            const snapshotBeforeLoad = createSeenSnapshot();
             const targetCount = Math.min(rawList.length, state.articleCount);
             const loadedArticles = [];
 
@@ -4224,10 +4218,13 @@
               const item = rawList[i];
               updateProgress(i + 1, targetCount, item.title);
 
-              const normPath = getNormalizedArticlePath(item.url);
-              const isNew = normPath ? !seenPathsSet.has(normPath) : false;
-              if (normPath) {
-                markArticlePathsAsSeen([normPath]);
+              // 1. Проверяем статус свежести ИСКЛЮЧИТЕЛЬНО по БазаДо (снимку)
+              const articleIdStr = (item.id !== undefined && item.id !== null && item.id !== '') ? String(item.id) : '';
+              const isNew = articleIdStr ? !snapshotBeforeLoad.has(articleIdStr) : false;
+
+              // 2. Сразу после успешного получения новости помещаем её ID в БазаОсновная (localStorage)
+              if (articleIdStr) {
+                markArticleIdsAsSeen([articleIdStr]);
               }
 
               try {
@@ -4369,17 +4366,21 @@
               return;
             }
 
-            const seenPathsSet = getSeenArticlePaths();
+            // Сценарий Б (догрузка / архив): НЕ перезаписываем БазаДо, используем существующий снимок
+            const snapshotForMore = seenSnapshotBeforeLoad.size > 0 ? seenSnapshotBeforeLoad : getSeenArticleIds();
             const needToLoad = finalTarget - startIndex;
 
             for (let i = startIndex; i < finalTarget; i++) {
               const item = state.rawPublications[i];
               updateProgress(i - startIndex + 1, needToLoad, item.title);
 
-              const normPath = getNormalizedArticlePath(item.url);
-              const isNew = normPath ? !seenPathsSet.has(normPath) : false;
-              if (normPath) {
-                markArticlePathsAsSeen([normPath]);
+              // 1. Проверяем статус свежести ИСКЛЮЧИТЕЛЬНО по БазаДо (снимку)
+              const articleIdStr = (item.id !== undefined && item.id !== null && item.id !== '') ? String(item.id) : '';
+              const isNew = articleIdStr ? !snapshotForMore.has(articleIdStr) : false;
+
+              // 2. Сразу после успешного получения новости помещаем её ID в БазаОсновная (localStorage)
+              if (articleIdStr) {
+                markArticleIdsAsSeen([articleIdStr]);
               }
 
               try {
